@@ -83,7 +83,7 @@ class Txt(object):
 """
 
 #⚠️ Dᴏɴ'ᴛ Rᴇᴍᴏᴠᴇ Oᴜʀ Cʀᴇᴅɪᴛꜱ @ᴩyʀᴏ_ʙᴏᴛᴢ🙏🥲
-    DEV_TXT = """» Special Thanks To ⚡️⚡️Sonic Family⚡️⚡ For Providing Such A Miraculous Bot In Hard Times. \nJoin @Sonic_Otakus And @Anime_Flix_Pro To Show Support."""
+    DEV_TXT = """»<b><i> Special Thanks To ⚡️⚡️Sonic Family⚡️⚡ For Providing Such A Miraculous Bot In Hard Times. \nJoin @Sonic_Otakus And @Anime_Flix_Pro To Show Support.</i></b>"""
 
     PROGRESS_BAR = """<b>\n
 ╭━━━━❰ᴘʀᴏɢʀᴇss ʙᴀʀ❱━➣
