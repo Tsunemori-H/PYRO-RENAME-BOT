@@ -8,6 +8,7 @@ class Database:
         self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
         self.db = self._client[database_name]
         self.col = self.db.user
+        self.req_user = self.db.req_user
 
     def new_user(self, id):
         return dict(
@@ -51,6 +52,13 @@ class Database:
     async def get_caption(self, id):
         user = await self.col.find_one({'_id': int(id)})
         return user.get('caption', None)
+
+    async def add_req_user(self, context: dict):
+        await self.req_user.insert_one(context)
+
+    async def is_req_user(self, user_id: int) -> bool:
+        user = await self.req_user.find_one({'user_id': user_id})
+        return bool(user)
 
 
 db = Database(Config.DB_URL, Config.DB_NAME)

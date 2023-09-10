@@ -21,39 +21,49 @@ Repo Link : https://github.com/TEAM-PYRO-BOTZ/PYRO-RENAME-BOT
 License Link : https://github.com/TEAM-PYRO-BOTZ/PYRO-RENAME-BOT/blob/main/LICENSE
 """
 
-from pyrogram import Client, filters, enums 
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import UserNotParticipant
+from pyrogram import Client, filters
+from pyrogram.types import (
+    ChatJoinRequest,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
+
 from config import Config
 from helper.database import db
 
-async def not_subscribed(_, client, message):
+
+async def not_subscribed(_, client: Client, message: Message):
     await db.add_user(client, message)
     if not Config.FORCE_SUB:
         return False
-    try:             
-        user = await client.get_chat_member(Config.FORCE_SUB, message.from_user.id) 
-        if user.status == enums.ChatMemberStatus.BANNED:
-            return True 
-        else:
-            return False                
-    except UserNotParticipant:
-        pass
-    return True
+    if await db.is_req_user(message.from_user.id):
+        return False
+    else:
+        return True
 
 
 @Client.on_message(filters.private & filters.create(not_subscribed))
-async def forces_sub(client, message):
-    buttons = [[InlineKeyboardButton(text="Join Channel", url=f"https://t.me/{Config.FORCE_SUB}") ]]
+async def forces_sub(client: Client, message: Message):
+    buttons = [[InlineKeyboardButton(text="Join Channel", url=Config.FORCE_SUB)]]
     text = "We Create Codes, We Buy Server, We Host Bots, We Provide Free Service. \nJoining Our Channel is The Least You Can Do To Respect Our Hardwork."
-    try:
-        user = await client.get_chat_member(Config.FORCE_SUB, message.from_user.id)    
-        if user.status == enums.ChatMemberStatus.BANNED:                                   
-            return await client.send_message(message.from_user.id, text="Sᴏʀʀy Yᴏᴜ'ʀᴇ Bᴀɴɴᴇᴅ Tᴏ Uꜱᴇ Mᴇ")  
-    except UserNotParticipant:                       
-        return await message.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
-    return await message.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
-          
+    if await db.is_req_user(message.from_user.id):
+        return
+    await message.reply_text(text, reply_markup=InlineKeyboardMarkup(buttons))
 
 
-
+@Client.on_chat_join_request(filters.chat(Config.FSUB_ID))
+async def new_member_join(client: Client, request: ChatJoinRequest):
+    user_id = request.from_user.id
+    name = request.from_user.first_name
+    username = request.from_user.username
+    date = request.date
+    context = {
+        "user_id": user_id,
+        "name": name,
+        "username": username,
+        "date": date,
+    }
+    if await db.is_req_user(user_id):
+        return
+    await db.add_req_user(context)
